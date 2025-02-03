@@ -1,0 +1,4 @@
+rootProject.name = 'task-planner-microservices'
+
+includeBuild 'task-planner-server'
+includeBuild 'config-server'
