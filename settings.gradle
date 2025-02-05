@@ -1,7 +1,3 @@
 rootProject.name = 'task-planner-microservices'
 
-includeBuild 'task-planner-server'
-includeBuild 'config-server'
-includeBuild 'task-planner-gateway'
-includeBuild 'task-planner-entity'
-includeBuild 'planner-tasks'
+include 'task-planner-server', 'config-server', 'task-planner-gateway', 'task-planner-entity', 'planner-tasks'
