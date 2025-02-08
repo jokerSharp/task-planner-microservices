@@ -1,4 +1,4 @@
-package org.example.plannertasks.aop;
+package org.example.plannerutils.aop;
 
 import lombok.extern.java.Log;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
 @Log
 public class LoggingAspect {
 
-    @Around("execution(* org.example.plannertasks.controller..*(..)))")
+    @Around("execution(* org.example.*.controller..*(..)))")
     public Object profileControllerMethods(ProceedingJoinPoint pjp) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
         String className = methodSignature.getDeclaringType().getSimpleName();

@@ -33,9 +33,10 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-	implementation project(':task-planner-entity')
-
 	runtimeOnly("org.postgresql:postgresql")
+
+	implementation project(':task-planner-entity')
+	implementation project(':planner-utils')
 }
 
 dependencyManagement {

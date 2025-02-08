@@ -1,6 +1,5 @@
 package org.example.taskplannerentity.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "task", schema = "todolist", catalog = "postgres")
+@Table(name = "task", schema = "tasks", catalog = "planner_tasks")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
