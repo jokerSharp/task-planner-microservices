@@ -3,6 +3,7 @@ package org.example.plannertasks.controller;
 import lombok.AllArgsConstructor;
 import org.example.plannertasks.requests.TaskSearchValues;
 import org.example.plannertasks.service.TaskService;
+import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.Task;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -24,11 +25,12 @@ public class TaskController {
 
     public static final String ID_COLUMN = "id";
 
-    private final TaskService taskService;
+    private final TaskService service;
+    private final UserWebClientBuilder userWebClientBuilder;
 
     @PostMapping("/all")
     public ResponseEntity<List<Task>> findAll(@RequestBody Long userId) {
-        return ResponseEntity.ok(taskService.findAll(userId));
+        return ResponseEntity.ok(service.findAll(userId));
     }
 
     @PostMapping("/add")
@@ -39,7 +41,10 @@ public class TaskController {
         if (task.getTitle() == null || task.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(taskService.add(task));
+        if (userWebClientBuilder.userExists(task.getUserId())) {
+            return ResponseEntity.ok(service.add(task));
+        }
+        return new ResponseEntity("user with id=%d is not found".formatted(task.getUserId()), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/update")
@@ -50,14 +55,14 @@ public class TaskController {
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        taskService.update(task);
+        service.update(task);
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable("id") Long id) {
         try {
-            taskService.deleteById(id);
+            service.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
@@ -69,7 +74,7 @@ public class TaskController {
     public ResponseEntity<Task> findById(@RequestBody Long id) {
         Task task = null;
         try {
-            task = taskService.findById(id);
+            task = service.findById(id);
         } catch (NoSuchElementException e) {
             e.printStackTrace();
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
@@ -126,7 +131,7 @@ public class TaskController {
         Sort sort = Sort.by(direction, sortColumn, ID_COLUMN);
 
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        Page<Task> result = taskService.findByParams(title, completed, priorityId, categoryId, userId, dateFrom, dateTo, pageRequest);
+        Page<Task> result = service.findByParams(title, completed, priorityId, categoryId, userId, dateFrom, dateTo, pageRequest);
 
         return ResponseEntity.ok(result);
     }

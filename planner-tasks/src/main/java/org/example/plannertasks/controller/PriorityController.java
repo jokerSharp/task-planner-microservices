@@ -3,6 +3,7 @@ package org.example.plannertasks.controller;
 import lombok.AllArgsConstructor;
 import org.example.plannertasks.requests.PrioritySearchValues;
 import org.example.plannertasks.service.PriorityService;
+import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.Priority;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -17,11 +18,12 @@ import java.util.NoSuchElementException;
 @RequestMapping("api/priorities")
 public class PriorityController {
 
-    private PriorityService priorityService;
+    private PriorityService service;
+    private final UserWebClientBuilder userWebClientBuilder;
 
     @PostMapping("/all")
     public List<Priority> findAll(@RequestBody Long userId) {
-        return priorityService.findAll(userId);
+        return service.findAll(userId);
     }
 
     @PostMapping("/add")
@@ -35,7 +37,10 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().isEmpty()) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(priorityService.add(priority));
+        if (userWebClientBuilder.userExists(priority.getUserId())) {
+            return ResponseEntity.ok(service.add(priority));
+        }
+        return new ResponseEntity("user with id=%d is not found".formatted(priority.getUserId()), HttpStatus.NOT_ACCEPTABLE);
     }
 
 
@@ -50,7 +55,7 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().isEmpty()) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-        priorityService.update(priority);
+        service.update(priority);
         return new ResponseEntity(HttpStatus.OK);
 
     }
@@ -59,7 +64,7 @@ public class PriorityController {
     public ResponseEntity<Priority> findById(@RequestBody Long id) {
         Priority priority = null;
         try {
-            priority = priorityService.findById(id);
+            priority = service.findById(id);
         } catch (NoSuchElementException e) {
             e.printStackTrace();
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
@@ -70,7 +75,7 @@ public class PriorityController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable("id") Long id) {
         try {
-            priorityService.deleteById(id);
+            service.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
@@ -83,6 +88,6 @@ public class PriorityController {
         if (prioritySearchValues.getUserId() == null) {
             return new ResponseEntity("missed param: email", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(priorityService.find(prioritySearchValues.getTitle(), prioritySearchValues.getUserId()));
+        return ResponseEntity.ok(service.find(prioritySearchValues.getTitle(), prioritySearchValues.getUserId()));
     }
 }

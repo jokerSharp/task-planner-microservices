@@ -1,6 +1,5 @@
 package org.example.taskplannerentity.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import org.hibernate.type.NumericBooleanConverter;
 import java.util.Objects;
 
 @Entity
-@Table(name = "activity", schema = "todolist", catalog = "postgres")
+@Table(name = "activity", schema = "tasks", catalog = "planner_tasks")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

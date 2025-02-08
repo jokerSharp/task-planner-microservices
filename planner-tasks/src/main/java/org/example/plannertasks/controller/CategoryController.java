@@ -3,6 +3,7 @@ package org.example.plannertasks.controller;
 import lombok.AllArgsConstructor;
 import org.example.plannertasks.requests.CategorySearchValues;
 import org.example.plannertasks.service.CategoryService;
+import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.Category;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
 public class CategoryController {
 
     private final CategoryService service;
+    private final UserWebClientBuilder userWebClientBuilder;
 
     @PostMapping("/all")
     public List<Category> findAll(@RequestBody Long userId) {
@@ -32,7 +34,10 @@ public class CategoryController {
         if (category.getTitle() == null || category.getTitle().trim().isEmpty()) {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(service.add(category));
+        if (userWebClientBuilder.userExists(category.getUserId())) {
+            return ResponseEntity.ok(service.add(category));
+        }
+        return new ResponseEntity("user with id=%d is not found".formatted(category.getUserId()), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/update")
