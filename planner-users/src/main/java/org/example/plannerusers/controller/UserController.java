@@ -1,8 +1,10 @@
 package org.example.plannerusers.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.plannerusers.request.UserSearchValues;
 import org.example.plannerusers.service.UserService;
+import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/users")
@@ -23,6 +26,7 @@ public class UserController {
     public static final String ID_COLUMN = "id";
 
     private final UserService service;
+    private final UserWebClientBuilder userWebClientBuilder;
 
     @PostMapping("/add")
     public ResponseEntity<User> add(@RequestBody User user) {
@@ -38,7 +42,12 @@ public class UserController {
         if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
             return new ResponseEntity("missing param: username MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(service.add(user));
+        user = service.add(user);
+        if (user != null) {
+            userWebClientBuilder.initUserData(user.getId())
+                    .subscribe(result -> log.info("user is populated: {}", result));
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/update")
