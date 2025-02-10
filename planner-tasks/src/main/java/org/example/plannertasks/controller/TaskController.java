@@ -1,9 +1,9 @@
 package org.example.plannertasks.controller;
 
 import lombok.AllArgsConstructor;
+import org.example.plannertasks.client.UserFeignClient;
 import org.example.plannertasks.requests.TaskSearchValues;
 import org.example.plannertasks.service.TaskService;
-import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.Task;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class TaskController {
     public static final String ID_COLUMN = "id";
 
     private final TaskService service;
-    private final UserWebClientBuilder userWebClientBuilder;
+    private final UserFeignClient userFeignClient;
 
     @PostMapping("/all")
     public ResponseEntity<List<Task>> findAll(@RequestBody Long userId) {
@@ -41,7 +41,7 @@ public class TaskController {
         if (task.getTitle() == null || task.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        if (userWebClientBuilder.userExists(task.getUserId())) {
+        if (userFeignClient.findById(task.getUserId()) != null) {
             return ResponseEntity.ok(service.add(task));
         }
         return new ResponseEntity("user with id=%d is not found".formatted(task.getUserId()), HttpStatus.NOT_ACCEPTABLE);

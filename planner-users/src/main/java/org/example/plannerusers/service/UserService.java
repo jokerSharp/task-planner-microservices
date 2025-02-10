@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -39,8 +41,8 @@ public class UserService {
         repository.deleteByEmail(email);
     }
 
-    public User findById(Long id) {
-        return repository.findById(id).orElse(null);
+    public Optional<User> findById(Long id) {
+        return repository.findById(id);
     }
 
     public Page<User> findByParams(String username, String email, Pageable pageable) {
