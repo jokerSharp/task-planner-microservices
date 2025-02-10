@@ -1,9 +1,9 @@
 package org.example.plannertasks.controller;
 
 import lombok.AllArgsConstructor;
+import org.example.plannertasks.client.UserFeignClient;
 import org.example.plannertasks.requests.PrioritySearchValues;
 import org.example.plannertasks.service.PriorityService;
-import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.Priority;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 public class PriorityController {
 
     private PriorityService service;
-    private final UserWebClientBuilder userWebClientBuilder;
+    private final UserFeignClient userFeignClient;
 
     @PostMapping("/all")
     public List<Priority> findAll(@RequestBody Long userId) {
@@ -37,7 +37,7 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().isEmpty()) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-        if (userWebClientBuilder.userExists(priority.getUserId())) {
+        if (userFeignClient.findById(priority.getUserId()) != null) {
             return ResponseEntity.ok(service.add(priority));
         }
         return new ResponseEntity("user with id=%d is not found".formatted(priority.getUserId()), HttpStatus.NOT_ACCEPTABLE);

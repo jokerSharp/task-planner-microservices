@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -90,15 +93,16 @@ public class UserController {
     }
 
     @PostMapping("/id")
-    public ResponseEntity findById(@RequestBody Long userId) {
-        User user = null;
+    public ResponseEntity<User> findById(@RequestBody Long userId) {
+        Optional<User> optionalUser = service.findById(userId);
         try {
-            user = service.findById(userId);
-        } catch (EmptyResultDataAccessException e) {
+            if (optionalUser.isPresent()) {
+                return ResponseEntity.ok(optionalUser.get());
+            }
+        } catch (NoSuchElementException e) {
             e.printStackTrace();
-            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(user);
+        return new ResponseEntity("user with id=%d is not found".formatted(userId), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PostMapping("/email")
