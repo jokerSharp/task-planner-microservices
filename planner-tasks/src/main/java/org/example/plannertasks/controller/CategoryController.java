@@ -5,6 +5,7 @@ import org.example.plannertasks.client.UserFeignClient;
 import org.example.plannertasks.requests.CategorySearchValues;
 import org.example.plannertasks.service.CategoryService;
 import org.example.taskplannerentity.entity.Category;
+import org.example.taskplannerentity.entity.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,11 @@ public class CategoryController {
         if (category.getTitle() == null || category.getTitle().trim().isEmpty()) {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
-        if (userFeignClient.findById(category.getUserId()) != null) {
+        ResponseEntity<User> response = userFeignClient.findById(category.getUserId());
+        if (response == null) {
+            return new ResponseEntity("user service is not available now", HttpStatus.NOT_FOUND);
+        }
+        if (response.getBody() != null) {
             return ResponseEntity.ok(service.add(category));
         }
         return new ResponseEntity("user with id=%d is not found".formatted(category.getUserId()), HttpStatus.NOT_ACCEPTABLE);
