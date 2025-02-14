@@ -2,6 +2,7 @@ package org.example.plannerusers.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.plannerusers.mq.MessageFuncActions;
 import org.example.plannerusers.request.UserSearchValues;
 import org.example.plannerusers.service.UserService;
 import org.example.plannerutils.client.UserWebClientBuilder;
@@ -30,6 +31,7 @@ public class UserController {
 
     private final UserService service;
     private final UserWebClientBuilder userWebClientBuilder;
+    private final MessageFuncActions messageFuncService;
 
     @PostMapping("/add")
     public ResponseEntity<User> add(@RequestBody User user) {
@@ -46,10 +48,7 @@ public class UserController {
             return new ResponseEntity("missing param: username MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
         user = service.add(user);
-        if (user != null) {
-            userWebClientBuilder.initUserData(user.getId())
-                    .subscribe(result -> log.info("user is populated: {}", result));
-        }
+        messageFuncService.sendNewUserMessage(user.getId());
         return ResponseEntity.ok(user);
     }
 
