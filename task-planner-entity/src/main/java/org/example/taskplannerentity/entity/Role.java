@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "role_data", schema = "todolist", catalog = "postgres")
+@Table(name = "role_data", schema = "users", catalog = "planner_users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -29,7 +29,7 @@ public class Role {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(schema = "todolist", name = "user_role",
+    @JoinTable(schema = "users", name = "user_role",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private Set<User> users;
