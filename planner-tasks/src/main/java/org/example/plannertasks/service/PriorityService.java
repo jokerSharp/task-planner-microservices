@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
-public class PriorityService {
+public class PriorityService implements UserRelatedService {
 
     private final PriorityRepository repository;
 
@@ -32,6 +32,11 @@ public class PriorityService {
     @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+        repository.deleteByUserId(userId);
     }
 
     public Priority findById(Long id) {

@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
-public class TaskService {
+public class TaskService implements UserRelatedService {
 
     private final TaskRepository repository;
 
@@ -36,6 +36,11 @@ public class TaskService {
     @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+        repository.deleteByUserId(userId);
     }
 
     public Page<Task> findByParams(String text, Boolean completed, Long priorityId, Long categoryId, Long userId,

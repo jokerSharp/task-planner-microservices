@@ -35,4 +35,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                             Pageable pageable);
 
     List<Task> findByUserIdOrderByTitleAsc(Long userId);
+
+    void deleteByUserId(Long userId);
 }

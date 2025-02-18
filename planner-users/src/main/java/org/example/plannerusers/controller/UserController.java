@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.plannerusers.mq.MessageFuncActions;
 import org.example.plannerusers.request.UserSearchValues;
 import org.example.plannerusers.service.UserService;
-import org.example.plannerutils.client.UserWebClientBuilder;
 import org.example.taskplannerentity.entity.User;
+import org.example.taskplannerentity.mq.MessageAction;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +30,6 @@ public class UserController {
     public static final String ID_COLUMN = "id";
 
     private final UserService service;
-    private final UserWebClientBuilder userWebClientBuilder;
     private final MessageFuncActions messageFuncService;
 
     @PostMapping("/add")
@@ -48,7 +47,7 @@ public class UserController {
             return new ResponseEntity("missing param: username MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
         user = service.add(user);
-        messageFuncService.sendNewUserMessage(user.getId());
+        messageFuncService.sendUserMessage(user.getId(), MessageAction.CREATE);
         return ResponseEntity.ok(user);
     }
 
@@ -73,6 +72,7 @@ public class UserController {
     public ResponseEntity deleteById(@RequestBody Long userId) {
         try {
             service.deleteByUserId(userId);
+            messageFuncService.sendUserMessage(userId, MessageAction.DELETE);
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
@@ -83,7 +83,9 @@ public class UserController {
     @PostMapping("/delete-by-email")
     public ResponseEntity deleteByEmail(@RequestBody String email) {
         try {
+            User user = service.findByEmail(email);
             service.deleteByUserEmail(email);
+            messageFuncService.sendUserMessage(user.getId(), MessageAction.DELETE);
         } catch (EmptyResultDataAccessException e) {
             e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
