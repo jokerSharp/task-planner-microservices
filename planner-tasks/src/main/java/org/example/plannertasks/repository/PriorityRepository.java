@@ -19,4 +19,6 @@ public interface PriorityRepository extends JpaRepository<Priority, Long> {
             " and p.userId=:userId " +
             "order by p.title asc")
     List<Priority> findByTitle(@Param("title") String title, @Param("userId") Long userId);
+
+    void deleteByUserId(Long userId);
 }

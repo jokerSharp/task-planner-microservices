@@ -19,4 +19,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             " and c.userId=:userId  " +
             " order by c.title asc")
     List<Category> findByTitle(@Param("title") String title, @Param("userId") Long userId);
+
+    void deleteByUserId(Long userId);
 }

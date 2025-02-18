@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
-public class CategoryService {
+public class CategoryService implements UserRelatedService {
 
     private final CategoryRepository repository;
 
@@ -32,6 +32,11 @@ public class CategoryService {
     @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+        repository.deleteByUserId(userId);
     }
 
     public List<Category> findByTitle(String text, Long userId) {

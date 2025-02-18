@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface StatRepository extends CrudRepository<Stat, Long> {
 
     Stat findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }
